@@ -15,16 +15,18 @@ out.write('"http://www.nitf.org/site/nitf-documentation/nitf-3-1.dtd"')
 out.close()
 
 with open('data/4193550_71475729.xml', 'rt') as f:
+
+def transformXML(storyname):
+    f = open(storyname, 'rt')
     tree = ET.parse(f)
     root = tree.getroot()
     ni = root.find('NewsItem')
     duid = ni.get('Duid')
-    multimedia_container = ni.find('NewsComponent')
-
-    texts_duid = multimedia_container.get('Duid') + '.texts'
-    photo_duid = multimedia_container.get('Duid') + '.photos'
-    video_duid = multimedia_container.get('Duid') + '.videos'
-
+    multimedia_duid = duid + '.multimedia'
+    texts_duid = multimedia_duid + '.texts'
+    photo_duid = multimedia_duid + '.photos'
+    video_duid = multimedia_duid + '.videos'
+    multimedia_container = ni.find('NewsComponent[@Duid="%s"]' % multimedia_duid)
     texts_container = multimedia_container.findall("./NewsComponent[@Duid='%s']" % texts_duid)[0]
     content_items = texts_container.findall('./NewsComponent/ContentItem')
     article = pick_article(content_items)
