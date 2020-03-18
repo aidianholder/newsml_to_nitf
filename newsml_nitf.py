@@ -8,13 +8,6 @@ def pick_article(content_items):
             article = ci.find("./DataContent/nitf")
             return article
 
-out = open("testout.xml", "w")
-out.write('<?xml version="1.0">')
-out.write('<!DOCTYPE nitf PUBLIC "-//IPTC-NAA//DTD NITF 3.1//EN"')
-out.write('"http://www.nitf.org/site/nitf-documentation/nitf-3-1.dtd"')
-out.close()
-
-with open('data/4193550_71475729.xml', 'rt') as f:
 
 def transformXML(storyname):
     f = open(storyname, 'rt')
@@ -89,9 +82,7 @@ def transformXML(storyname):
             meta_title.set('value', title.text)
             media_caption = ET.SubElement(media, 'media-caption')
             media_caption.text = v_caption"""
+    return ET.tostring(article, encoding='UTF-8', method='xml')
 
 
 
-    out_binary = open("testout.xml", "wb")
-    out_binary.write(ET.tostring(article, encoding='UTF-8', method='xml'))
-    out_binary.close()
