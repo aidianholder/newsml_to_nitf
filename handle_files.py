@@ -1,5 +1,6 @@
 import os
 import newsml_nitf
+import shutil
 
 DIR_NAME = os.path.expanduser("~/Documents/efe/")
 DIR_OUT = os.path.expanduser("~/Documents/efe_out/")
@@ -16,3 +17,8 @@ with os.scandir(DIR_NAME) as efe_files:
             out_binary = open(DIR_OUT + file.name, "wb")
             out_binary.write(story)
             out_binary.close()
+        else:
+            src = file.path
+            dst = DIR_OUT + file.name
+            shutil.copy2(src, dst)
+

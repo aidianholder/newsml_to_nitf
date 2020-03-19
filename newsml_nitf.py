@@ -20,14 +20,16 @@ def transformXML(storyname):
     photo_duid = multimedia_duid + '.photos'
     video_duid = multimedia_duid + '.videos'
     multimedia_container = ni.find('NewsComponent[@Duid="%s"]' % multimedia_duid)
-    texts_container = multimedia_container.findall("./NewsComponent[@Duid='%s']" % texts_duid)[0]
-    content_items = texts_container.findall('./NewsComponent/ContentItem')
-    article = pick_article(content_items)
+    try:
+        texts_container = multimedia_container.findall("./NewsComponent[@Duid='%s']" % texts_duid)[0]
+        content_items = texts_container.findall('./NewsComponent/ContentItem')
+        article = pick_article(content_items)
+    except IndexError:
+        article = ET.fromstring("<nitf><body><body.content></body.content></body></nitf>")
     body = article.find('body')
     bc = body.find('body.content')
-
-    photo_container = multimedia_container.findall("./NewsComponent[@Duid='%s']" % photo_duid)[0]
-    if photo_container:
+    try:
+        photo_container = multimedia_container.findall("./NewsComponent[@Duid='%s']" % photo_duid)[0]
         photo_components = photo_container.findall('NewsComponent')
         for photo in photo_components:
             loc = photo.findall("./NewsComponent/ContentItem")[0]
@@ -44,9 +46,10 @@ def transformXML(storyname):
             caption = text_field.findall("./DataContent/nitf/body/body.content/p")[0].text
             copy = ET.SubElement(media, "media-caption")
             copy.text = caption
-
-    video_container = multimedia_container.findall("./NewsComponent[@Duid='%s']" % video_duid)[0]
-    if video_container:
+    except IndexError:
+        pass
+    try:
+        video_container = multimedia_container.findall("./NewsComponent[@Duid='%s']" % video_duid)[0]
         video_components = video_container.findall('NewsComponent')
         for video in video_components:
             ET.dump(video)
@@ -67,22 +70,6 @@ def transformXML(storyname):
             poster = ET.SubElement(media, 'media-reference')
             poster.set("name", "tncms-view-poster")
             poster.set("source", poster_url)
-            ###get copy for title, caption, external id string###
-            #text_loc = video.find(".//MediaType[@FormalName='Text']/../ContentItem")
-            """text_loc = video.findall("./NewsComponent/ContentItem")[2]
-            id_string = text_loc.find("./DataContent/nitf/head/docdata/doc-id").get('id-string')
-            title = text_loc.find("./DataContent/nitf/head/title")
-            ET.dump(title)
-            v_caption = text_loc.find(".//body.content")
-            meta = ET.SubElement(media, 'media-metadata')
-            meta.set('name', 'id')
-            meta.set('value', id_string)
-            meta_title = ET.SubElement(media, 'media-metadata')
-            meta_title.set('name', 'title')
-            meta_title.set('value', title.text)
-            media_caption = ET.SubElement(media, 'media-caption')
-            media_caption.text = v_caption"""
+    except IndexError:
+        pass
     return ET.tostring(article, encoding='UTF-8', method='xml')
-
-
-
